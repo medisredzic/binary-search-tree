@@ -125,6 +125,7 @@ class BinarySearchTree:
         if not isinstance(key, int):
             raise ValueError('Key is not an integer')
 
+        self._size -= 1
         tmp_node = self._root
         prev_node = self._root
 
@@ -148,22 +149,58 @@ class BinarySearchTree:
         if not node:
             return iter(())
 
+        if node:
+            yield from self._inorder(node)
 
     def preorder(self, node: TreeNode = None) -> Generator[TreeNode, None, None]:
         """Yield nodes in preorder."""
         node = node or self._root
         if not node:
             return iter(())
-        yield from self.preorder(node.left)
-        yield from self.preorder(node.right)
+
+        yield self._root
+
+        tmp = self._root.left
+
+        while True:
+            if tmp is not None:
+                yield tmp
+
+            if tmp is None:
+                break
+
+            if tmp.left is None:
+                tmp = tmp.right
+            else:
+                tmp = tmp.left
+
+        tmp = self._root.right
+        right = None
+
+        while True:
+            if tmp is not None:
+                yield tmp
+
+            if tmp is None:
+                yield right
+                break
+
+            if tmp.left is None:
+                tmp = tmp.right
+            else:
+                right = tmp.right
+                tmp = tmp.left
+
+
 
     def postorder(self, node: TreeNode = None) -> Generator[TreeNode, None, None]:
         """Yield nodes in postorder."""
         node = node or self._root
         if not node:
             return iter(())
-        pass
-        # TODO
+
+        if node:
+            yield from self._postorder(node)
 
     # this allows for e.g. `for node in tree`, or `list(tree)`.
     def __iter__(self) -> Generator[TreeNode, None, None]:
@@ -207,16 +244,19 @@ class BinarySearchTree:
         return self._root
 
     def _inorder(self, current_node):
-        pass
-        # TODO
+        if current_node:
+            yield from self._inorder(current_node.left)
+            yield current_node
+            yield from self._inorder(current_node.right)
 
     def _preorder(self, current_node):
-        pass
-        # TODO
+        self.preorder(current_node)
 
     def _postorder(self, current_node):
-        pass
-        # TODO
+        if current_node:
+            yield from self._postorder(current_node.left)
+            yield from self._postorder(current_node.right)
+            yield current_node
 
     # You can of course add your own methods and/or functions!
     # (A method is within a class, a function outside of it.)
